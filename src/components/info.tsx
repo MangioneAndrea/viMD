@@ -6,7 +6,7 @@ const Info: Component = () => {
 	const [mode, setMode] = createSignal("-- INSERT --");
 	const [register, setRegister] = createSignal("\"a");
 	return (
-		<div class="bg-gray-900 fixed w-full bottom-0 font-mono flex justify-between">
+		<div class="bg-gray-900 fixed w-full bottom-0 flex justify-between">
 			<span class="text-violet-300">
 				{mode()}
 				{macro()}
