@@ -12,7 +12,11 @@ const Editor: Component = () => {
 					str.split("").map((char, col) => {
 						let className = "";
 						if (row === vimState.cursorLine && col === vimState.cursorColumn) {
-							className += "bg-white "
+							if (vimState.mode === "insert") {
+								className += "box-border border-l border-white "
+							} else {
+								className += "bg-white "
+							}
 						}
 						return <span class={className}>{char}</span>
 					})
