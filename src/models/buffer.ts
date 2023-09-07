@@ -33,6 +33,17 @@ export function new_line(vim: Vim, at: number) {
 	vim.buffer.text = lines.join("");
 }
 
+export function delete_line(vim: Vim, at: number) {
+	let lines = getLines(vim);
+	let res = lines.splice(at, 1);
+	vim.buffer.text = lines.join("");
+	return res[0];
+}
+
+export function current_line(vim: Vim) {
+	return getLines(vim)[vim.cursor.y];
+}
+
 function storeStatus(vim: Vim) {
 	vim.buffer.history = {
 		text: vim.buffer.text,
@@ -58,3 +69,11 @@ export function writeBuffer(vim: Vim) {
 	vim.symbolBuffer = "";
 }
 
+export function write(vim: Vim, text: string) {
+	let lines = getLines(vim);
+	lines[vim.cursor.y] =
+		lines[vim.cursor.y].slice(0, vim.cursor.x) +
+		text +
+		lines[vim.cursor.y].slice(vim.cursor.x);
+	vim.buffer.text = lines.join("");
+}

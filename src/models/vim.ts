@@ -32,6 +32,8 @@ const NAVIGATION_COMMAND = {
 	j: (vim: Vim) => Cursor.down(vim, 1),
 	k: (vim: Vim) => Cursor.up(vim, 1),
 	l: (vim: Vim) => Cursor.right(vim, 1),
+	0: (vim: Vim) => Cursor.left(vim, Infinity),
+	$: (vim: Vim) => Cursor.right(vim, Infinity),
 };
 
 const MODES_SWITCH = {
@@ -57,11 +59,9 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
 		},
 		V: (vim: Vim) => (vim.mode = "visual line"),
 		i: (vim: Vim) => {
-			storeStatus(vim);
 			vim.mode = "insert";
 		},
 		a: (vim: Vim) => {
-			storeStatus(vim);
 			Cursor.right(vim, 1);
 			vim.mode = "insert";
 		},
@@ -75,8 +75,6 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
 			vim.mode = "insert";
 		},
 		x: (vim: Vim) => {
-			storeStatus(vim);
-			storeStatus(vim);
 			let lines = getLines(vim);
 			lines[vim.cursorLine] =
 				lines[vim.cursorLine].slice(
@@ -89,43 +87,21 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
 			vim.text = lines.join("");
 		},
 		dd: (vim: Vim) => {
-			storeStatus(vim);
-			let lines = getLines(vim);
-			let line = lines.splice(vim.cursorLine, 1)[0];
+			const line = Buffer.delete_line(vim, vim.cursor.y);
 			vim.registers.set('"', line);
-			vim.text = lines.join("");
 		},
 		yy: (vim: Vim) => {
-			storeStatus(vim);
-			vim.registers.set('"', getLines(vim)[vim.cursorLine]);
+			vim.registers.set('"', Buffer.current_line(vim));
 		},
 		p: (vim: Vim) => {
-			storeStatus(vim);
-			const lines = getLines(vim);
-			lines.splice(
-				vim.cursorLine + 1,
-				0,
-				vim.registers.get('"') || ""
-			);
-			vim.text = lines.join("");
-			setCursorLine(vim, vim.cursorLine + 1);
+			const text = vim.registers.get('"') || "";
+			Buffer.write(vim, text);
 		},
 		P: (vim: Vim) => {
-			storeStatus(vim);
-			const lines = getLines(vim);
-			lines.splice(
-				vim.cursorLine,
-				0,
-				vim.registers.get('"') || ""
-			);
-			vim.text = lines.join("");
+			const text = vim.registers.get('"') || "";
+			Buffer.write(vim, text);
 		},
-		u: (vim: Vim) => {
-			if (vim.history) {
-				vim.text = vim.history.text;
-				vim.history = vim.history.previous;
-			}
-		},
+		u: (vim: Vim) => {},
 	},
 	visual: {
 		...NAVIGATION_COMMAND,
@@ -145,19 +121,11 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
 	},
 	insert: {
 		Enter: (vim: Vim) => {
-			let lines = getLines(vim);
-			lines[vim.cursorLine] =
-				lines[vim.cursorLine].slice(
-					0,
-					vim.cursorColumn
-				) +
-				"\n" +
-				lines[vim.cursorLine].slice(vim.cursorColumn);
-			vim.text = lines.join("");
-			vim.symbolBuffer = "";
-			setCursorLine(vim, vim.cursorLine + 1);
-			setCursorColumn(vim, 0);
+			Buffer.write(vim, "\n");
+			Cursor.down(vim);
+			Cursor.left(vim, Infinity);
 		},
+		Backspace: (vim: Vim) => {},
 	},
 };
 
@@ -189,7 +157,7 @@ export const enterSymbol = (symbol: string) => {
 
 			if (vim.mode === "insert") {
 				Buffer.writeBuffer(vim);
-				Cursor.down(vim);
+				Cursor.right(vim);
 			}
 			vim.symbolBuffer = "";
 		})
