@@ -32,8 +32,8 @@ const NAVIGATION_COMMAND = {
     j: (vim: Vim) => Cursor.down(vim, 1),
     k: (vim: Vim) => Cursor.up(vim, 1),
     l: (vim: Vim) => Cursor.right(vim, 1),
-    0: (vim: Vim) => Cursor.left(vim, Infinity),
-    $: (vim: Vim) => Cursor.right(vim, Infinity)
+    0: (vim: Vim) => Cursor.start(vim),
+    $: (vim: Vim) => Cursor.end(vim)
 };
 
 const MODES_SWITCH = {
