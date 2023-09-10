@@ -75,3 +75,4 @@ export function write(vim: Vim, text: string) {
         lines[vim.cursor.y].slice(vim.cursor.x);
     vim.buffer.text = lines.join('');
 }
+

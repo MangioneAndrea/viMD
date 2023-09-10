@@ -3,6 +3,7 @@ import * as Cursor from './cursor';
 import * as Buffer from './buffer';
 
 type modes = 'normal' | 'visual' | 'insert' | 'visual line';
+type selection = { x: number; y: number };
 
 export type Vim = {
     buffer: Buffer.Type;
@@ -10,30 +11,36 @@ export type Vim = {
     mode: modes;
     symbolBuffer: string;
     macro: string | null;
+    selectionStart: selection;
+    selectionEnd: selection;
     registers: Map<string, string>;
 };
-const [vim, setVim] = createStore<Vim>({
-    buffer: Buffer.default_buffer(),
-    mode: 'normal',
-    symbolBuffer: '',
-    cursor: {
-        x: 0,
-        y: 0,
-        preferredX: 0
-    },
-    macro: null,
-    registers: new Map()
-});
-
-export const vimState = vim;
 
 const NAVIGATION_COMMAND = {
-    h: (vim: Vim) => Cursor.left(vim, 1),
-    j: (vim: Vim) => Cursor.down(vim, 1),
-    k: (vim: Vim) => Cursor.up(vim, 1),
-    l: (vim: Vim) => Cursor.right(vim, 1),
-    0: (vim: Vim) => Cursor.start(vim),
-    $: (vim: Vim) => Cursor.end(vim)
+    h: (vim: Vim) => {
+        Cursor.left(vim, 1);
+        vim.selectionEnd = { ...vim.cursor };
+    },
+    j: (vim: Vim) => {
+        Cursor.down(vim, 1);
+        vim.selectionEnd = { ...vim.cursor };
+    },
+    k: (vim: Vim) => {
+        Cursor.up(vim, 1);
+        vim.selectionEnd = { ...vim.cursor };
+    },
+    l: (vim: Vim) => {
+        Cursor.right(vim, 1);
+        vim.selectionEnd = { ...vim.cursor };
+    },
+    0: (vim: Vim) => {
+        Cursor.start(vim);
+        vim.selectionEnd = { ...vim.cursor };
+    },
+    $: (vim: Vim) => {
+        Cursor.end(vim);
+        vim.selectionEnd = { ...vim.cursor };
+    }
 };
 
 const MODES_SWITCH = {
@@ -51,13 +58,21 @@ const MACRO = {
     }
 };
 
+const startVisualMode = (vim: Vim) => {
+    vim.mode = 'visual';
+    vim.selectionStart = { ...vim.cursor };
+    vim.selectionEnd = { ...vim.cursor };
+};
+const startVisualLineMode = (vim: Vim) => {
+    vim.mode = 'visual line';
+    vim.selectionStart = { ...vim.cursor };
+    vim.selectionEnd = { ...vim.cursor };
+};
 const commands: { [mode in modes]: { [command: string]: Function } } = {
     normal: {
         ...NAVIGATION_COMMAND,
-        v: (vim: Vim) => {
-            vim.mode = 'visual';
-        },
-        V: (vim: Vim) => (vim.mode = 'visual line'),
+        v: startVisualMode,
+        V: startVisualLineMode,
         i: (vim: Vim) => {
             vim.mode = 'insert';
         },
@@ -101,14 +116,14 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
     visual: {
         ...NAVIGATION_COMMAND,
         v: (vim: Vim) => (vim.mode = 'normal'),
-        V: (vim: Vim) => (vim.mode = 'visual line'),
+        V: startVisualLineMode,
         y: (vim: Vim) => {
             vim.mode = 'normal';
         }
     },
     'visual line': {
         ...NAVIGATION_COMMAND,
-        v: (vim: Vim) => (vim.mode = 'visual'),
+        v: startVisualMode,
         V: (vim: Vim) => (vim.mode = 'normal'),
         y: (vim: Vim) => {
             vim.mode = 'normal';
@@ -156,3 +171,26 @@ export const enterSymbol = (symbol: string) => {
     );
     console.log('done');
 };
+
+const [vim, setVim] = createStore<Vim>({
+    buffer: Buffer.default_buffer(),
+    mode: 'normal',
+    symbolBuffer: '',
+    cursor: {
+        x: 0,
+        y: 0,
+        preferredX: 0
+    },
+    macro: null,
+    registers: new Map(),
+    selectionStart: {
+        x: 0,
+        y: 0
+    },
+    selectionEnd: {
+        x: 0,
+        y: 0
+    }
+});
+
+export const vimState = vim;
