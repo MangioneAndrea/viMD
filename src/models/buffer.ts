@@ -56,8 +56,8 @@ export function delete_from_to(
     a: { x: number; y: number },
     b: { x: number; y: number }
 ) {
-    let top;
-    let bottom;
+    let top: { x: number; y: number };
+    let bottom: { x: number; y: number };
 
     if (a.y > b.y) {
         top = b;
@@ -73,10 +73,20 @@ export function delete_from_to(
         bottom = a;
     }
 
-    const lines = getLines(vim);
+    const lines = getLines(vim)
+        .map((line, idx) => {
+            if (idx !== top.y && idx !== bottom.y) return line;
 
-    for (let y = top.y; y<=bottom.y; y++){
-    }
+            if (top.y === bottom.y) {
+                return line.slice(0, top.x) + line.slice(bottom.x + 1);
+            } else if (idx === top.y) {
+                return line.slice(0, top.x);
+            } else {
+                return line.slice(bottom.x + 1);
+            }
+        })
+        .filter((_, idx) => idx <= top.y || idx >= bottom.y);
+    vim.buffer.text = lines.join('');
 }
 
 export function getLines(vim: Vim) {

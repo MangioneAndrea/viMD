@@ -90,7 +90,7 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
             vim.mode = 'insert';
         },
         x: (vim: Vim) => {
-            Buffer.delete_from_to(vim, vim.selectionStart, vim.selectionEnd);
+            Buffer.delete_from_to(vim, vim.cursor, vim.cursor);
             vim.mode = 'normal';
         },
         dd: (vim: Vim) => {
@@ -116,7 +116,12 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
         V: startVisualLineMode,
         y: (vim: Vim) => {
             vim.mode = 'normal';
-        }
+        },
+        x: (vim: Vim) => {
+            Buffer.delete_from_to(vim, vim.selectionStart, vim.selectionEnd);
+	    Cursor.go_to(vim, vim.selectionStart);
+            vim.mode = 'normal';
+        },
     },
     'visual line': {
         ...NAVIGATION_COMMAND,
@@ -124,7 +129,12 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
         V: (vim: Vim) => (vim.mode = 'normal'),
         y: (vim: Vim) => {
             vim.mode = 'normal';
-        }
+        },
+        x: (vim: Vim) => {
+            Buffer.delete_from_to(vim, vim.selectionStart, vim.selectionEnd);
+	    Cursor.go_to(vim, vim.selectionStart);
+            vim.mode = 'normal';
+        },
     },
     insert: {
         Enter: (vim: Vim) => {
@@ -145,7 +155,7 @@ export const enterSymbol = (symbol: string) => {
             if (symbol === 'Escape') {
                 vim.symbolBuffer = '';
                 if (vim.mode === 'insert') {
-                    Cursor.up(vim);
+                    Cursor.left(vim);
                 }
                 vim.mode = 'normal';
             }
