@@ -90,11 +90,8 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
             vim.mode = 'insert';
         },
         x: (vim: Vim) => {
-            let lines = getLines(vim);
-            lines[vim.cursorLine] =
-                lines[vim.cursorLine].slice(0, vim.cursorColumn) +
-                lines[vim.cursorLine].slice(vim.cursorColumn + 1);
-            vim.text = lines.join('');
+            Buffer.delete_from_to(vim, vim.selectionStart, vim.selectionEnd);
+            vim.mode = 'normal';
         },
         dd: (vim: Vim) => {
             const line = Buffer.delete_line(vim, vim.cursor.y);

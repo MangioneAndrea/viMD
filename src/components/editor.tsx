@@ -10,7 +10,7 @@ const Editor: Component = () => {
             tabindex={0}
         >
             {getLines(vimState).map((str, row) => (
-                <div class="w-full">
+                <div class="w-full flex">
                     <span
                         class={`select-none inline-block min-w-[48px] text-right pr-2 text-zinc-600 font-bold ${
                             row === vimState.cursor.y ? 'pr-5' : ''
@@ -18,7 +18,7 @@ const Editor: Component = () => {
                     >
                         {Math.abs(row - vimState.cursor.y) || row}
                     </span>
-                    <span class="text-gray-200 whitespace-pre">
+                    <span class="flex flex-wrap flex-1 text-gray-200 whitespace-pre">
                         {str.split('').map((char, col) => {
                             let className = '';
                             if (

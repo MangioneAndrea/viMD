@@ -51,6 +51,34 @@ function storeStatus(vim: Vim) {
     };
 }
 
+export function delete_from_to(
+    vim: Vim,
+    a: { x: number; y: number },
+    b: { x: number; y: number }
+) {
+    let top;
+    let bottom;
+
+    if (a.y > b.y) {
+        top = b;
+        bottom = a;
+    } else if (a.y < b.y) {
+        top = a;
+        bottom = b;
+    } else if (a.x < b.x) {
+        top = a;
+        bottom = b;
+    } else {
+        top = b;
+        bottom = a;
+    }
+
+    const lines = getLines(vim);
+
+    for (let y = top.y; y<=bottom.y; y++){
+    }
+}
+
 export function getLines(vim: Vim) {
     return vim.buffer.text
         .split('\n')
@@ -75,4 +103,3 @@ export function write(vim: Vim, text: string) {
         lines[vim.cursor.y].slice(vim.cursor.x);
     vim.buffer.text = lines.join('');
 }
-
