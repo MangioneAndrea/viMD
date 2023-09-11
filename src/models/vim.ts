@@ -131,7 +131,7 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
             vim.mode = 'normal';
         },
         x: (vim: Vim) => {
-            Buffer.delete_from_to(vim, vim.selectionStart, vim.selectionEnd);
+            Buffer.delete_lines(vim, vim.selectionStart.y, vim.selectionEnd.y);
 	    Cursor.go_to(vim, vim.selectionStart);
             vim.mode = 'normal';
         },

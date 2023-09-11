@@ -51,6 +51,15 @@ function storeStatus(vim: Vim) {
     };
 }
 
+export function delete_lines(vim: Vim, a: number, b: number) {
+    let from = Math.min(a, b);
+    let count = Math.max(a, b) - from;
+
+    let lines = getLines(vim);
+    let res = lines.splice(from, count);
+    vim.buffer.text = lines.join('');
+    return res;
+}
 export function delete_from_to(
     vim: Vim,
     a: { x: number; y: number },
