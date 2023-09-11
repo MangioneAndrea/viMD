@@ -7,7 +7,6 @@ const App: Component = () => {
     return (
         <div class="flex w-screen h-screen font-mono">
             <Editor />
-            <Preview />
             <Info />
         </div>
     );

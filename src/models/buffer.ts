@@ -1,16 +1,17 @@
 import { Vim } from './vim';
 
 type History = {
-    previous?: History;
-    next?: History;
-    text: string;
+    currentIndex: number;
+    entries: Array<{
+        text: string;
+    }>;
 };
 
 export type Type = {
     text: string;
     selectionStart: number;
     selectionEnd: number;
-    history?: History;
+    history: History;
 };
 export const default_buffer = () => ({
     text: 'hi\nhello -\n asdas   ^\n \n ',
@@ -24,19 +25,29 @@ export const default_buffer = () => ({
         preferredX: 0
     },
     macro: null,
-    registers: new Map()
+    registers: new Map(),
+    history: {
+        currentIndex: 0,
+        entries: [
+            {
+                text: 'hi\nhello -\n asdas   ^\n \n '
+            }
+        ]
+    }
 });
 
 export function new_line(vim: Vim, at: number) {
     let lines = getLines(vim);
     lines.splice(at, 0, ' ');
     vim.buffer.text = lines.join('');
+    store_status(vim);
 }
 
 export function delete_line(vim: Vim, at: number) {
     let lines = getLines(vim);
     let res = lines.splice(at, 1);
     vim.buffer.text = lines.join('');
+    store_status(vim);
     return res[0];
 }
 
@@ -44,20 +55,42 @@ export function current_line(vim: Vim) {
     return getLines(vim)[vim.cursor.y];
 }
 
-function storeStatus(vim: Vim) {
-    vim.buffer.history = {
-        text: vim.buffer.text,
-        previous: vim.buffer.history
-    };
+function store_status(vim: Vim) {
+    vim.buffer.history.currentIndex++;
+    vim.buffer.history.entries.splice(
+        vim.buffer.history.currentIndex,
+        Infinity,
+        {
+            text: vim.buffer.text
+        }
+    );
+}
+
+export function history_backwards(vim: Vim) {
+    vim.buffer.history.currentIndex = Math.max(
+        0,
+        vim.buffer.history.currentIndex - 1
+    );
+    vim.buffer.text =
+        vim.buffer.history.entries[vim.buffer.history.currentIndex].text;
+}
+export function history_forwards(vim: Vim) {
+    vim.buffer.history.currentIndex = Math.min(
+        vim.buffer.history.entries.length - 1,
+        vim.buffer.history.currentIndex + 1
+    );
+    vim.buffer.text =
+        vim.buffer.history.entries[vim.buffer.history.currentIndex].text;
 }
 
 export function delete_lines(vim: Vim, a: number, b: number) {
     let from = Math.min(a, b);
-    let count = Math.max(a, b) - from;
+    let count = Math.max(a, b) - from + 1;
 
     let lines = getLines(vim);
     let res = lines.splice(from, count);
     vim.buffer.text = lines.join('');
+    store_status(vim);
     return res;
 }
 export function delete_from_to(
@@ -96,6 +129,7 @@ export function delete_from_to(
         })
         .filter((_, idx) => idx <= top.y || idx >= bottom.y);
     vim.buffer.text = lines.join('');
+    store_status(vim);
 }
 
 export function getLines(vim: Vim) {
@@ -112,6 +146,7 @@ export function writeBuffer(vim: Vim) {
         lines[vim.cursor.y].slice(vim.cursor.x);
     vim.buffer.text = lines.join('');
     vim.symbolBuffer = '';
+    store_status(vim);
 }
 
 export function write(vim: Vim, text: string) {
@@ -121,4 +156,5 @@ export function write(vim: Vim, text: string) {
         text +
         lines[vim.cursor.y].slice(vim.cursor.x);
     vim.buffer.text = lines.join('');
+    store_status(vim);
 }

@@ -108,7 +108,12 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
             const text = vim.registers.get('"') || '';
             Buffer.write(vim, text);
         },
-        u: (vim: Vim) => {}
+        u: (vim: Vim) => {
+            Buffer.history_backwards(vim);
+        },
+        r: (vim: Vim) => {
+            Buffer.history_forwards(vim);
+        }
     },
     visual: {
         ...NAVIGATION_COMMAND,
@@ -119,9 +124,14 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
         },
         x: (vim: Vim) => {
             Buffer.delete_from_to(vim, vim.selectionStart, vim.selectionEnd);
-	    Cursor.go_to(vim, vim.selectionStart);
+            Cursor.go_to(vim, vim.selectionStart);
             vim.mode = 'normal';
         },
+        d: (vim: Vim) => {
+            Buffer.delete_from_to(vim, vim.selectionStart, vim.selectionEnd);
+            Cursor.go_to(vim, vim.selectionStart);
+            vim.mode = 'normal';
+        }
     },
     'visual line': {
         ...NAVIGATION_COMMAND,
@@ -132,9 +142,15 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
         },
         x: (vim: Vim) => {
             Buffer.delete_lines(vim, vim.selectionStart.y, vim.selectionEnd.y);
-	    Cursor.go_to(vim, vim.selectionStart);
+            Cursor.go_to(vim, vim.selectionStart);
             vim.mode = 'normal';
         },
+        d: (vim: Vim) => {
+            console.log(vim.selectionStart.y, vim.selectionEnd.y);
+            Buffer.delete_lines(vim, vim.selectionStart.y, vim.selectionEnd.y);
+            Cursor.go_to(vim, vim.selectionStart);
+            vim.mode = 'normal';
+        }
     },
     insert: {
         Enter: (vim: Vim) => {
