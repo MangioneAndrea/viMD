@@ -104,8 +104,16 @@ const commands: { [mode in modes]: Command } = {
         	vim.registers.set('"', line[0]);
 	    }
 	},
-        yy: (vim: Vim) => {
-            vim.registers.set('"', Buffer.current_line(vim));
+        y: {
+	    y: (vim: Vim) => {
+        	vim.registers.set('"', Buffer.current_line(vim));
+	    },
+	    j: (vim: Vim)=>{
+        	vim.registers.set('"', Buffer.getLines(vim).slice(vim.cursor.y, vim.cursor.y + 2).join(""));
+	    },
+	    k: (vim: Vim)=>{
+        	vim.registers.set('"', Buffer.getLines(vim).slice(vim.cursor.y -1 , vim.cursor.y + 1).join(""));
+	    }
         },
         p: (vim: Vim) => {
             const text = vim.registers.get('"') || '';
