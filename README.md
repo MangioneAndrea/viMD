@@ -14,4 +14,4 @@ Not all motions are replicated! It's just a minimal editor.
 - multibuffer
 - non-vim mode (forget it, learn vim instead)
 
-live under [http://andrea.mangione.dev/viMD](viMD)
+live under [viMD](http://andrea.mangione.dev/viMD)
