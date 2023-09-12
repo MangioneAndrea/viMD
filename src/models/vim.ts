@@ -9,7 +9,7 @@ export type Vim = {
     buffer: Buffer.Type;
     cursor: Cursor.Type;
     mode: modes;
-    symbolBuffer: string;
+    symbolBuffer: string[];
     macro: string | null;
     selectionStart: selection;
     selectionEnd: selection;
@@ -43,13 +43,6 @@ const NAVIGATION_COMMAND = {
     }
 };
 
-const MODES_SWITCH = {
-    v: (vim: Vim) => {
-        vim.mode = 'visual';
-    },
-    V: (vim: Vim) => (vim.mode = 'visual line')
-};
-
 const MACRO = {
     q: (vim: Vim) => {
         if (vim.macro) {
@@ -68,7 +61,10 @@ const startVisualLineMode = (vim: Vim) => {
     vim.selectionStart = { ...vim.cursor };
     vim.selectionEnd = { ...vim.cursor };
 };
-const commands: { [mode in modes]: { [command: string]: Function } } = {
+
+type Command = { [command: string]: Function | Command };
+
+const commands: { [mode in modes]: Command } = {
     normal: {
         ...NAVIGATION_COMMAND,
         v: startVisualMode,
@@ -93,10 +89,21 @@ const commands: { [mode in modes]: { [command: string]: Function } } = {
             Buffer.delete_from_to(vim, vim.cursor, vim.cursor);
             vim.mode = 'normal';
         },
-        dd: (vim: Vim) => {
-            const line = Buffer.delete_line(vim, vim.cursor.y);
-            vim.registers.set('"', line);
-        },
+        d: { 
+	    d: (vim: Vim) => {
+        	const line = Buffer.delete_line(vim, vim.cursor.y);
+        	vim.registers.set('"', line);
+            }, 
+	    j: (vim: Vim)=>{
+        	const line = Buffer.delete_lines(vim, vim.cursor.y, vim.cursor.y +1);
+        	vim.registers.set('"', line[0]);
+	    },
+	    k: (vim: Vim)=>{
+        	const line = Buffer.delete_lines(vim, vim.cursor.y -1, vim.cursor.y);
+		Cursor.up(vim, 1);
+        	vim.registers.set('"', line[0]);
+	    }
+	},
         yy: (vim: Vim) => {
             vim.registers.set('"', Buffer.current_line(vim));
         },
@@ -166,30 +173,36 @@ export const enterSymbol = (symbol: string) => {
     setVim(
         produce((vim) => {
             if (['Shift'].includes(symbol)) return;
-            vim.symbolBuffer += symbol;
+            vim.symbolBuffer.push(symbol);
 
             if (symbol === 'Escape') {
-                vim.symbolBuffer = '';
+                vim.symbolBuffer = [];
                 if (vim.mode === 'insert') {
                     Cursor.left(vim);
                 }
                 vim.mode = 'normal';
             }
-            if (!commands[vim.mode][vim.symbolBuffer] && vim.mode !== 'insert')
-                return;
 
-            let fn = commands[vim.mode][vim.symbolBuffer];
-            if (fn) {
-                fn(vim);
-                vim.symbolBuffer = '';
+	    let pointedCommand: any = commands[vim.mode];
+	    for(let partial of vim.symbolBuffer){
+		    pointedCommand = pointedCommand[partial];
+	    }
+            if (!pointedCommand && vim.mode !== 'insert'){
+            	vim.symbolBuffer = [];
+                return;
+	    }
+
+            if (typeof pointedCommand === "function") {
+                pointedCommand(vim);
+                vim.symbolBuffer = [];
                 return;
             }
 
             if (vim.mode === 'insert') {
                 Buffer.writeBuffer(vim);
                 Cursor.right(vim);
+		vim.symbolBuffer = [];
             }
-            vim.symbolBuffer = '';
         })
     );
     console.log('done');
@@ -198,7 +211,7 @@ export const enterSymbol = (symbol: string) => {
 const [vim, setVim] = createStore<Vim>({
     buffer: Buffer.default_buffer(),
     mode: 'normal',
-    symbolBuffer: '',
+    symbolBuffer: [],
     cursor: {
         x: 0,
         y: 0,
