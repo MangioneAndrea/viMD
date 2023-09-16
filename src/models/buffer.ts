@@ -1,5 +1,32 @@
 import { Vim } from './vim';
 
+const initial_text = `# Welcome to viMD
+
+use the classic vim motions to write the markdown
+
+# More about the program
+
+This is not a fork of vim or such. This projects just reuses a subset of vim motions.
+
+## Issues
+
+Found any issue? Feel free to create a ticket or submit a pr to \`https://github.com/MangioneAndrea/viMD\`
+
+## Planned features
+
+- Vim specific
+	- missing main motions (w, b, c, s...)
+	- registers (')
+	- macros (q)
+- Quality of life
+	- system clipboard
+- Features
+	- export as pdf
+	- settings
+		- margin
+		- light/dark mode
+`
+
 type History = {
     currentIndex: number;
     entries: Array<{
@@ -14,22 +41,7 @@ export type Type = {
     history: History;
 };
 export const default_buffer = () => ({
-    text: 
-`# Welcome to viMD
-
-use the classic vim motions to write the markdown
-
-
-To use the system clipboard, you can use \`ctrl + p\`, it is equivalent to the more common \`'+p\`
-
-# More about the program
-
-This is not a fork of vim or such. This projects just reuses a subset of vim motions.
-
-## Issues
-
-Found any issue? Feel free to create a ticket or submit a pr to \`https://github.com/MangioneAndrea/viMD\`
-`,
+    text: initial_text,
     mode: 'normal',
     symbolBuffer: [],
     selectionStart: 0,
@@ -45,7 +57,7 @@ Found any issue? Feel free to create a ticket or submit a pr to \`https://github
         currentIndex: 0,
         entries: [
             {
-                text: 'hi\nhello -\n asdas   ^\n \n '
+                text: initial_text 
             }
         ]
     }
