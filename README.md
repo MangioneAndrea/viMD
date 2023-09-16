@@ -1,17 +1,26 @@
-# viMD
+# Welcome to viMD
 
-A Markdown editor with vim motion.
+use the classic vim motions to write the markdown
 
-Not all motions are replicated! It's just a minimal editor.
+# More about the program
 
+This is not a fork of vim or such. This projects just reuses a subset of vim motions.
 
-## Ideas
-- export as pdf (all browser, no server)
-- resizable buffer
-- macros
-- local storage on index db
-- multifile
-- multibuffer
-- non-vim mode (forget it, learn vim instead)
+## Issues
 
-live under [viMD](http://andrea.mangione.dev/viMD)
+Found any issue? Feel free to create a ticket or submit a pr to \`https://github.com/MangioneAndrea/viMD\`
+
+## Planned features
+
+- Vim specific
+	- missing main motions (w, b, c, s...)
+	- registers (')
+	- macros (q)
+- Quality of life
+	- system clipboard
+- Features
+	- export as pdf
+	- settings
+		- margin
+		- light/dark mode
+
