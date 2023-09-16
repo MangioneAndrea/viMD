@@ -16,7 +16,7 @@ export type Type = {
 export const default_buffer = () => ({
     text: 'hi\nhello -\n asdas   ^\n \n ',
     mode: 'normal',
-    symbolBuffer: '',
+    symbolBuffer: [],
     selectionStart: 0,
     selectionEnd: 0,
     cursor: {
@@ -142,10 +142,10 @@ export function writeBuffer(vim: Vim) {
     let lines = getLines(vim);
     lines[vim.cursor.y] =
         lines[vim.cursor.y].slice(0, vim.cursor.x) +
-        vim.symbolBuffer +
+        vim.symbolBuffer.join() +
         lines[vim.cursor.y].slice(vim.cursor.x);
     vim.buffer.text = lines.join('');
-    vim.symbolBuffer = '';
+    vim.symbolBuffer = [];
     store_status(vim);
 }
 
