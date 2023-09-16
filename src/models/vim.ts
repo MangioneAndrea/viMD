@@ -161,7 +161,6 @@ const commands: { [mode in modes]: Command } = {
             vim.mode = 'normal';
         },
         d: (vim: Vim) => {
-            console.log(vim.selectionStart.y, vim.selectionEnd.y);
             Buffer.delete_lines(vim, vim.selectionStart.y, vim.selectionEnd.y);
             Cursor.go_to(vim, vim.selectionStart);
             vim.mode = 'normal';
@@ -213,7 +212,6 @@ export const enterSymbol = (symbol: string) => {
             }
         })
     );
-    console.log('done');
 };
 
 const [vim, setVim] = createStore<Vim>({

@@ -5,6 +5,7 @@ import Info from './components/info';
 import { DraggableSeparator } from './components/draggable-separator';
 
 const App: Component = () => {
+
     return (
         <div class="flex w-screen h-screen font-mono">
             <DraggableSeparator>
