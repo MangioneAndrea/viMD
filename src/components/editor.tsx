@@ -20,7 +20,7 @@ const Editor: Component = () => {
                     </span>
                     <span class="flex flex-wrap flex-1 text-gray-200 whitespace-pre">
                         {str.split('').map((char, col) => {
-                            let className = '';
+                            let className = 'w-[8.8px] ';
                             if (
                                 row === vimState.cursor.y &&
                                 col === vimState.cursor.x

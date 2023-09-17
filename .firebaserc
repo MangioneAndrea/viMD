@@ -1,5 +1,22 @@
 {
   "projects": {
     "default": "vimd-c8a3e"
-  }
+  },
+  "targets": {
+    "vimd-c8a3e": {
+      "hosting": {
+        "viMD": [
+          "."
+        ]
+      }
+    },
+    "andreamangione-e1426": {
+      "hosting": {
+        "viMD": [
+          "vi-md"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
