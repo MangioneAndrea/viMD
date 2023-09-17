@@ -1,7 +1,6 @@
 {
   "hosting": {
     "public": "dist",
-    "target": "viMD",
     "ignore": [
       "firebase.json",
       "**/.*",
