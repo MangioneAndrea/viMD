@@ -89,31 +89,49 @@ const commands: { [mode in modes]: Command } = {
             Buffer.delete_from_to(vim, vim.cursor, vim.cursor);
             vim.mode = 'normal';
         },
-        d: { 
-	    d: (vim: Vim) => {
-        	const line = Buffer.delete_line(vim, vim.cursor.y);
-        	vim.registers.set('"', line);
-            }, 
-	    j: (vim: Vim)=>{
-        	const line = Buffer.delete_lines(vim, vim.cursor.y, vim.cursor.y +1);
-        	vim.registers.set('"', line[0]);
-	    },
-	    k: (vim: Vim)=>{
-        	const line = Buffer.delete_lines(vim, vim.cursor.y -1, vim.cursor.y);
-		Cursor.up(vim, 1);
-        	vim.registers.set('"', line[0]);
-	    }
-	},
+        d: {
+            d: (vim: Vim) => {
+                const line = Buffer.delete_line(vim, vim.cursor.y);
+                vim.registers.set('"', line);
+            },
+            j: (vim: Vim) => {
+                const line = Buffer.delete_lines(
+                    vim,
+                    vim.cursor.y,
+                    vim.cursor.y + 1
+                );
+                vim.registers.set('"', line[0]);
+            },
+            k: (vim: Vim) => {
+                const line = Buffer.delete_lines(
+                    vim,
+                    vim.cursor.y - 1,
+                    vim.cursor.y
+                );
+                Cursor.up(vim, 1);
+                vim.registers.set('"', line[0]);
+            }
+        },
         y: {
-	    y: (vim: Vim) => {
-        	vim.registers.set('"', Buffer.current_line(vim));
-	    },
-	    j: (vim: Vim)=>{
-        	vim.registers.set('"', Buffer.getLines(vim).slice(vim.cursor.y, vim.cursor.y + 2).join(""));
-	    },
-	    k: (vim: Vim)=>{
-        	vim.registers.set('"', Buffer.getLines(vim).slice(vim.cursor.y -1 , vim.cursor.y + 1).join(""));
-	    }
+            y: (vim: Vim) => {
+                vim.registers.set('"', Buffer.current_line(vim));
+            },
+            j: (vim: Vim) => {
+                vim.registers.set(
+                    '"',
+                    Buffer.getLines(vim)
+                        .slice(vim.cursor.y, vim.cursor.y + 2)
+                        .join('')
+                );
+            },
+            k: (vim: Vim) => {
+                vim.registers.set(
+                    '"',
+                    Buffer.getLines(vim)
+                        .slice(vim.cursor.y - 1, vim.cursor.y + 1)
+                        .join('')
+                );
+            }
         },
         p: (vim: Vim) => {
             const text = vim.registers.get('"') || '';
@@ -190,25 +208,27 @@ export const enterSymbol = (symbol: string) => {
                 vim.mode = 'normal';
             }
 
-	    let pointedCommand: any = commands[vim.mode];
-	    for(let partial of vim.symbolBuffer){
-		    pointedCommand = pointedCommand[partial];
-	    }
-            if (!pointedCommand && vim.mode !== 'insert'){
-            	vim.symbolBuffer = [];
+            let pointedCommand: any = commands[vim.mode];
+            for (let partial of vim.symbolBuffer) {
+                pointedCommand = pointedCommand[partial];
+            }
+            if (!pointedCommand && vim.mode !== 'insert') {
+                vim.symbolBuffer = [];
                 return;
-	    }
+            }
 
-            if (typeof pointedCommand === "function") {
+            if (typeof pointedCommand === 'function') {
                 pointedCommand(vim);
                 vim.symbolBuffer = [];
                 return;
             }
 
             if (vim.mode === 'insert') {
-                Buffer.writeBuffer(vim);
-                Cursor.right_inclusive(vim);
-		vim.symbolBuffer = [];
+                if (symbol.length === 1) {
+                    Buffer.writeBuffer(vim);
+                    Cursor.right_inclusive(vim);
+                }
+                vim.symbolBuffer = [];
             }
         })
     );
