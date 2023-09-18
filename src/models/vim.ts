@@ -73,7 +73,7 @@ const commands: { [mode in modes]: Command } = {
             vim.mode = 'insert';
         },
         a: (vim: Vim) => {
-            Cursor.right(vim, 1);
+            Cursor.right_inclusive(vim, 1);
             vim.mode = 'insert';
         },
         o: (vim: Vim) => {
@@ -207,7 +207,7 @@ export const enterSymbol = (symbol: string) => {
 
             if (vim.mode === 'insert') {
                 Buffer.writeBuffer(vim);
-                Cursor.right(vim);
+                Cursor.right_inclusive(vim);
 		vim.symbolBuffer = [];
             }
         })

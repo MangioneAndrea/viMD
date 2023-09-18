@@ -24,6 +24,11 @@ export function right(vim: Vim, amount: number = 1) {
     vim.cursor.preferredX = vim.cursor.x;
 }
 
+export function right_inclusive(vim: Vim, amount: number = 1) {
+    set_cursor_column(vim, vim.cursor.x + amount, true);
+    vim.cursor.preferredX = vim.cursor.x;
+}
+
 export function start(vim: Vim) {
     vim.cursor.preferredX = 0;
     set_cursor_column(vim, 0);
@@ -37,10 +42,17 @@ export function set_cursor_line(vim: Vim, to: number) {
     vim.cursor.y = Math.max(0, Math.min(to, Buffer.getLines(vim).length - 1));
     set_cursor_column(vim, vim.cursor.x);
 }
-export function set_cursor_column(vim: Vim, to: number) {
+export function set_cursor_column(
+    vim: Vim,
+    to: number,
+    include_last: boolean = false
+) {
     let line = Buffer.getLines(vim)[vim.cursor.y];
     if (line !== undefined) {
-        vim.cursor.x = Math.max(0, Math.min(to, line.length - 2));
+        vim.cursor.x = Math.max(
+            0,
+            Math.min(to, line.length - (2 - Number(include_last)))
+        );
     }
 }
 
