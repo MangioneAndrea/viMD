@@ -1,22 +1,5 @@
 {
   "projects": {
-    "default": "andreamangione-e1426"
-  },
-  "targets": {
-    "vimd-c8a3e": {
-      "hosting": {
-        "viMD": [
-          "."
-        ]
-      }
-    },
-    "andreamangione-e1426": {
-      "hosting": {
-        "viMD": [
-          "vi-md"
-        ]
-      }
-    }
-  },
-  "etags": {}
+    "default": "vimd-307f5"
+  }
 }
