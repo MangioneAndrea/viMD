@@ -1,5 +1,4 @@
 import { vimState, enterSymbol } from '../models/vim';
-import { getLines } from '../models/buffer';
 import { type Component } from 'solid-js';
 
 const Editor: Component = () => {
@@ -9,7 +8,7 @@ const Editor: Component = () => {
             onKeyDown={(evt) => enterSymbol(evt.key)}
             tabindex={0}
         >
-            {getLines(vimState).map((str, row) => (
+            {vimState.buffer.lines.map((str, row) => (
                 <div class="w-full flex">
                     <span
                         class={`select-none inline-block min-w-[48px] text-right pr-2 text-zinc-600 font-bold ${

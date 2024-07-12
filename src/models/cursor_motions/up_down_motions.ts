@@ -1,4 +1,4 @@
-const up_down_motions = {
+export default {
     // [count] lines upward |linewise|.
     k: () => {},
     ArrowUp: () => {},

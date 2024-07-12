@@ -25,7 +25,7 @@ Found any issue? Feel free to create a ticket or submit a pr to \`https://github
 	- settings
 		- margin
 		- light/dark mode
-`
+`;
 
 type History = {
     currentIndex: number;
@@ -34,52 +34,33 @@ type History = {
     }>;
 };
 
-export type Type = {
-    text: string;
-    selectionStart: number;
-    selectionEnd: number;
-    history: History;
-};
-export const default_buffer = () => ({
-    text: initial_text,
-    mode: 'normal',
-    symbolBuffer: [],
-    selectionStart: 0,
-    selectionEnd: 0,
-    cursor: {
-        x: 0,
-        y: 0,
-        preferredX: 0
-    },
-    macro: null,
-    registers: new Map(),
-    history: {
-        currentIndex: 0,
-        entries: [
-            {
-                text: initial_text 
-            }
-        ]
+export class Buffer {
+    lines: string[];
+
+    constructor(text: string = initial_text) {
+        this.lines = text
+            .split('\n')
+            .map((str, idx, all) => (idx < all.length - 1 ? str + '\n' : str));
     }
-});
+
+    get text() {
+        return this.lines.join('\n');
+    }
+
+    clone() {
+        return new Buffer(this.text);
+    }
+}
 
 export function new_line(vim: Vim, at: number) {
-    let lines = getLines(vim);
-    lines.splice(at, 0, ' ');
-    vim.buffer.text = lines.join('');
+    vim.buffer.lines.splice(at, 0, ' ');
     store_status(vim);
 }
 
 export function delete_line(vim: Vim, at: number) {
-    let lines = getLines(vim);
-    let res = lines.splice(at, 1);
-    vim.buffer.text = lines.join('');
+    let res = vim.buffer.lines.splice(at, 1);
     store_status(vim);
     return res[0];
-}
-
-export function current_line(vim: Vim) {
-    return getLines(vim)[vim.cursor.y];
 }
 
 function store_status(vim: Vim) {
@@ -114,9 +95,7 @@ export function delete_lines(vim: Vim, a: number, b: number) {
     let from = Math.min(a, b);
     let count = Math.max(a, b) - from + 1;
 
-    let lines = getLines(vim);
-    let res = lines.splice(from, count);
-    vim.buffer.text = lines.join('');
+    let res = vim.buffer.lines.splice(from, count);
     store_status(vim);
     return res;
 }
@@ -142,7 +121,7 @@ export function delete_from_to(
         bottom = a;
     }
 
-    const lines = getLines(vim)
+    vim.buffer.lines = vim.buffer.lines
         .map((line, idx) => {
             if (idx !== top.y && idx !== bottom.y) return line;
 
@@ -155,33 +134,14 @@ export function delete_from_to(
             }
         })
         .filter((_, idx) => idx <= top.y || idx >= bottom.y);
-    vim.buffer.text = lines.join('');
-    store_status(vim);
-}
-
-export function getLines(vim: Vim) {
-    return vim.buffer.text
-        .split('\n')
-        .map((str, idx, all) => (idx < all.length - 1 ? str + '\n' : str));
-}
-
-export function writeBuffer(vim: Vim) {
-    let lines = getLines(vim);
-    lines[vim.cursor.y] =
-        lines[vim.cursor.y].slice(0, vim.cursor.x) +
-        vim.symbolBuffer.join() +
-        lines[vim.cursor.y].slice(vim.cursor.x);
-    vim.buffer.text = lines.join('');
-    vim.symbolBuffer = [];
     store_status(vim);
 }
 
 export function write(vim: Vim, text: string) {
-    let lines = getLines(vim);
+    let lines = vim.buffer.lines;
     lines[vim.cursor.y] =
         lines[vim.cursor.y].slice(0, vim.cursor.x) +
         text +
         lines[vim.cursor.y].slice(vim.cursor.x);
-    vim.buffer.text = lines.join('');
     store_status(vim);
 }

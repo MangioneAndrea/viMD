@@ -1,5 +1,5 @@
 // https://vimdoc.sourceforge.net/htmldoc/motion.html
-const motions = {
+export default {
     // change
     c: () => {},
     // delete

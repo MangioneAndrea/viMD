@@ -1,4 +1,4 @@
-const word_motions = {
+export default {
     // [count] words forward.  |exclusive| motion.
     w: () => {},
     // [count] WORDS forward.  |exclusive| motion.

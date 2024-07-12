@@ -1,4 +1,4 @@
-export const left_right_motions = {
+export default {
     // [count] characters to the left.  |exclusive| motion.
     h: () => {},
     LeftArrow: () => {},
